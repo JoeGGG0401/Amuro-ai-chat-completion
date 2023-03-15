@@ -1,14 +1,4 @@
 # -*- coding:utf-8 -*-
-title = """<h1 align="center">川虎ChatGPT 🚀</h1>"""
-description = """<div align=center>
-
-由Bilibili [土川虎虎虎](https://space.bilibili.com/29125536) 和 [明昭MZhao](https://space.bilibili.com/24807452)开发
-
-访问川虎ChatGPT的 [GitHub项目](https://github.com/GaiZhenbiao/ChuanhuChatGPT) 下载最新版脚本
-
-此App使用 `gpt-3.5-turbo` 大语言模型
-</div>
-"""
 customCSS = """
 code {
     display: inline;
