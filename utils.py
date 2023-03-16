@@ -97,7 +97,7 @@ def construct_assistant(text):
     return construct_text("assistant", text)
 
 def construct_token_message(token, stream=False):
-    return f"Token 计数: {token}"
+    return f"Token count: {token}"
 
 def get_response(openai_api_key, system_prompt, history, temperature, top_p, stream, selected_model):
     headers = {
@@ -131,7 +131,7 @@ def stream_predict(openai_api_key, system_prompt, history, inputs, chatbot, all_
     print("实时回答模式")
     partial_words = ""
     counter = 0
-    status_text = "开始实时传输回答……"
+    status_text = "Start streaming answers in real time..."
     history.append(construct_user(inputs))
     history.append(construct_assistant(""))
     chatbot.append((parse_text(inputs), ""))
@@ -170,7 +170,7 @@ def stream_predict(openai_api_key, system_prompt, history, inputs, chatbot, all_
                 chunk = json.loads(chunk[6:])
             except json.JSONDecodeError:
                 print(chunk)
-                status_text = f"JSON解析错误。请重置对话。收到的内容: {chunk}"
+                status_text = f"JSON parsing error. Please reset the conversation. Received content: {chunk}"
                 yield get_return_value()
                 continue
             # decode each line as response data is in bytes
@@ -183,7 +183,7 @@ def stream_predict(openai_api_key, system_prompt, history, inputs, chatbot, all_
                 try:
                     partial_words = partial_words + chunk['choices'][0]["delta"]["content"]
                 except KeyError:
-                    status_text = standard_error_msg + "API回复中找不到内容。很可能是Token计数达到上限了。请重置对话。当前Token计数: " + str(sum(all_token_counts))
+                    status_text = standard_error_msg + "Content not found in API response. It is likely that the Token count has reached the upper limit. Please reset the conversation. Current Token count: " + str(sum(all_token_counts))
                     yield get_return_value()
                     break
                 history[-1] = construct_assistant(partial_words)
@@ -229,7 +229,7 @@ def predict(openai_api_key, system_prompt, history, inputs, chatbot, all_token_c
         all_token_counts.append(0)
         yield chatbot, history, status_text, all_token_counts
         return
-    yield chatbot, history, "开始生成回答……", all_token_counts
+    yield chatbot, history, "Start generating answers...", all_token_counts
     if stream:
         print("使用流式传输")
         iter = stream_predict(openai_api_key, system_prompt, history, inputs, chatbot, all_token_counts, top_p, temperature, selected_model)
@@ -250,14 +250,14 @@ def predict(openai_api_key, system_prompt, history, inputs, chatbot, all_token_c
         print(f"精简token中{all_token_counts}/{max_token}")
         iter = reduce_token_size(openai_api_key, system_prompt, history, chatbot, all_token_counts, top_p, temperature, stream=False, hidden=True)
         for chatbot, history, status_text, all_token_counts in iter:
-            status_text = f"Token 达到上限，已自动降低Token计数至 {status_text}"
+            status_text = f"Token has reached the upper limit, and the Token count has been automatically reduced to {status_text}"
             yield chatbot, history, status_text, all_token_counts
 
 
 def retry(openai_api_key, system_prompt, history, chatbot, token_count, top_p, temperature, stream=False, selected_model = MODELS[0]):
     print("重试中……")
     if len(history) == 0:
-        yield chatbot, history, f"{standard_error_msg}上下文是空的", token_count
+        yield chatbot, history, f"{standard_error_msg} context is empty", token_count
         return
     history.pop()
     inputs = history.pop()["content"]
